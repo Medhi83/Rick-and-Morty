@@ -5,8 +5,7 @@ install_env: # Create virtualenv and install dependencies
 	env/bin/pip install -U pip
 	env/bin/pip install -r requirements-lock.txt
 
-lock_requirements: # Lock dependencies versions
-	docker build -t rick-n-morty .
+lock_requirements: build # Lock dependencies versions
 	docker run --name rick-n-morty -d rick-n-morty sleep 3600
 	docker exec rick-n-morty pip install -r requirements.txt
 	docker exec rick-n-morty pip freeze -r requirements.txt > requirements-lock.txt
@@ -19,6 +18,10 @@ build: # Build the docker image
 	docker rm -f rick-n-morty
 	docker build -t rick-n-morty .
 
-run: build # Build the new docker image and run it
-	docker run -p 8080:8080 --name rick-n-morty -d rick-n-morty
+run: # Run rick-n-morty app and database
+	docker-compose up -d
+	docker-compose logs -f -t app
+
+stop: # Stop rick-n-morty app and database
+	docker-compose down --remove-orphans
 	
