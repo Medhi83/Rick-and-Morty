@@ -25,3 +25,5 @@ run: # Run rick-n-morty app and database
 stop: # Stop rick-n-morty app and database
 	docker-compose down --remove-orphans
 	
+import_data: # Run script to import data from /json_data/rick_morty-characters_v1.json and /json_data/rick_morty-episodes_v1.json
+	cd scripts/ && ../env/bin/python import_data.py
