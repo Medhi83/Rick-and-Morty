@@ -1,17 +1,21 @@
 import os
 
 from flask import Flask
-from flask_restful import Api
+from flask_smorest import Api
 
-from .characters.rest import Characters
+
+from .characters.rest import blueprint_characters
 from .db import db
-from .episodes.rest import Episodes
+from .episodes.rest import blueprint_episodes
 
 app = Flask(__name__)
-api = Api(app, prefix="/api")
+app.config["API_TITLE"] = "Rick and Morty API"
+app.config["API_VERSION"] = "v1"
+app.config["OPENAPI_VERSION"] = "3.1.0"
 
-api.add_resource(Characters, "/characters")
-api.add_resource(Episodes, "/episodes")
+api = Api(app)
+api.register_blueprint(blueprint_characters)
+api.register_blueprint(blueprint_episodes)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///data.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
