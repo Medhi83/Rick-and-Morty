@@ -19,11 +19,11 @@ def client() -> Generator[FlaskClient, None, None]:
     with app.test_client() as client:
         with app.app_context():
             db.create_all()
-        yield client
+            yield client
 
-    _tearsdown(app)
+    _teardown(app)
 
 
-def _tearsdown(app: Flask) -> None:
+def _teardown(app: Flask) -> None:
     with app.app_context():
         db.drop_all()
