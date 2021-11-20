@@ -1,6 +1,7 @@
 from datetime import datetime
-from typing import Dict, Optional, Union
+from typing import Any, Dict, Generator, Optional, Union
 
+from ..characters.models import CharacterModel
 from ..db import db
 
 
@@ -25,13 +26,20 @@ class EpisodeModel(db.Model):
         self.air_date = air_date
         self.episode = episode
 
-    def json(self) -> Dict[str, Union[str, int, datetime]]:
-        return {
+    def json(self, with_characters: bool = False) -> Dict[str, Any]:
+        data = {
             "id": self.id,
             "name": self.name,
             "air_date": self.air_date.strftime("%B %d, %Y"),
             "episode": self.episode,
         }
+        if with_characters:
+            data.update({"characters": [character_json for character_json in self.get_characters_to_json()]})
+        return data
+
+    def get_characters_to_json(self) -> Generator[Dict, None, None]:
+        for character in CharacterModel.query.with_parent(self):
+            yield character.json()
 
     def save_to_db(self) -> None:
         db.session.add(self)

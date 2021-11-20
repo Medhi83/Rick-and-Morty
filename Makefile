@@ -19,7 +19,7 @@ test:
 
 build: # Build the docker image
 	docker rm -f rick-n-morty
-	docker build --no-cache -t rick-n-morty .
+	docker build -t rick-n-morty .
 
 run: # Run rick-n-morty app and database
 	docker-compose up -d

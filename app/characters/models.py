@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Generator, List, Optional, Union
 
 from ..db import db
 
@@ -42,16 +42,23 @@ class CharacterModel(db.Model):
         if episodes is not None:
             self.episodes = episodes
 
-    def json(self) -> Dict[str, Union[str, Any]]:
-        return {
+    def json(self, with_episodes: bool = False) -> Dict[str, Union[str, Any]]:
+        data = {
             "id": self.id,
             "name": self.name,
             "status": self.status,
             "species": self.species,
             "type": self.type,
             "gender": self.gender,
-            "episodes": [episode.json() for episode in self.episodes],
         }
+
+        if with_episodes:
+            data.update({"episodes": [episode_json for episode_json in self.get_episodes_to_json()]})
+        return data
+
+    def get_episodes_to_json(self) -> Generator[Dict, None, None]:
+        for episode in self.episodes:
+            yield episode.json()
 
     def save_to_db(self) -> None:
         db.session.add(self)

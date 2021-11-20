@@ -17,7 +17,7 @@ class Episodes(MethodView):
         )
         pagination_parameters.item_count = len(pagination_results.items)
         return {
-            "objects": [episode.json() for episode in pagination_results.items],
+            "objects": [episode.json(with_characters=True) for episode in pagination_results.items],
             "page": pagination_results.page,
             "per_page": pagination_results.per_page,
             "count": pagination_parameters.item_count,

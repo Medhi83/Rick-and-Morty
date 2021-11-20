@@ -19,7 +19,7 @@ class Characters(MethodView):
         )
         pagination_parameters.item_count = len(pagination_results.items)
         return {
-            "objects": [character.json() for character in pagination_results.items],
+            "objects": [character.json(with_episodes=True) for character in pagination_results.items],
             "page": pagination_results.page,
             "per_page": pagination_results.per_page,
             "count": pagination_parameters.item_count,
