@@ -14,9 +14,12 @@ lock_requirements: build # Lock dependencies versions
 check_security: # Checks dependencies for known security vulnerabilities.
 	safety check -r requirements-lock.txt
 
+test:
+	env/bin/pytest tests/
+
 build: # Build the docker image
 	docker rm -f rick-n-morty
-	docker build -t rick-n-morty .
+	docker build --no-cache -t rick-n-morty .
 
 run: # Run rick-n-morty app and database
 	docker-compose up -d
@@ -27,3 +30,6 @@ stop: # Stop rick-n-morty app and database
 	
 import_data: # Run script to import data from /json_data/rick_morty-characters_v1.json and /json_data/rick_morty-episodes_v1.json
 	cd scripts/ && ../env/bin/python import_data.py
+
+create_database: # Create rick-n-morty database
+	cd scripts/ && ../env/bin/python create_database.py
