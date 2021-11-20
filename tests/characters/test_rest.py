@@ -14,7 +14,6 @@ def test_get_list(client: FlaskClient):
     response = client.get("/characters/")
     json_data = response.get_json()
     assert json_data == {
-        "count": 1,
         "objects": [rick.json(with_episodes=True)],
         "page": 1,
         "per_page": 10,

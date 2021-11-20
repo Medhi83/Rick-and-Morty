@@ -8,6 +8,15 @@ from .comments.rest import blueprint_comments
 from .db import db
 from .episodes.rest import blueprint_episodes
 
+class Config:
+    API_TITLE = "Rick and Morty API"
+    API_VERSION = "v1"
+    OPENAPI_VERSION = "3.0.2"
+    OPENAPI_URL_PREFIX = "/api"
+    OPENAPI_SWAGGER_UI_PATH = "/swagger"
+    OPENAPI_SWAGGER_UI_VERSION = "3.24.2"
+    OPENAPI_SWAGGER_UI_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/"
+    OPENAPI_REDOC_PATH = "redoc"
 
 def init_db(app: Flask):
     """Setup database."""
@@ -24,10 +33,8 @@ def init_db(app: Flask):
 def create_app() -> Flask:
     """Create Flask application."""
     app = Flask(__name__)
-    app.config["API_TITLE"] = "Rick and Morty API"
-    app.config["API_VERSION"] = "v1"
-    app.config["OPENAPI_VERSION"] = "3.1.0"
-
+    app.config.from_object(Config)
+    
     api = Api(app)
     api.register_blueprint(blueprint_characters)
     api.register_blueprint(blueprint_episodes)
