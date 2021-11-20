@@ -4,6 +4,7 @@ from flask import Flask
 from flask_smorest import Api
 
 from .characters.rest import blueprint_characters
+from .comments.rest import blueprint_comments
 from .db import db
 from .episodes.rest import blueprint_episodes
 
@@ -30,6 +31,7 @@ def create_app() -> Flask:
     api = Api(app)
     api.register_blueprint(blueprint_characters)
     api.register_blueprint(blueprint_episodes)
+    api.register_blueprint(blueprint_comments)
 
     init_db(app)
 
