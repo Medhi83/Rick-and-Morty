@@ -1,9 +1,19 @@
 from datetime import datetime
 from typing import Any, Dict, Optional, Union
 
-from ..characters.models import CharacterModel
 from ..db import db
-from ..episodes.models import EpisodeModel
+
+
+class CommentException(Exception):
+    """Exceptions Related to the comment model"""
+
+    pass
+
+
+class CharacterNotInEpisode(CommentException):
+    """The character does not belong to the episode"""
+
+    pass
 
 
 class CommentModel(db.Model):
@@ -11,15 +21,18 @@ class CommentModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
-    character = db.Column(db.Integer, db.ForeignKey("character.id"))
-    episode = db.Column(db.Integer, db.ForeignKey("episode.id"))
+    character_id = db.Column(db.Integer, db.ForeignKey("character.id"))
+    episode_id = db.Column(db.Integer, db.ForeignKey("episode.id"))
+
+    character = db.relationship("CharacterModel", lazy="joined")
+    episode = db.relationship("EpisodeModel", lazy="joined")
     created_time = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __init__(
         self,
         content: str,
-        character: CharacterModel,
-        episode: EpisodeModel,
+        character: int,
+        episode: int,
         created_time: Optional[datetime] = None,
         _id: Optional[int] = None,
     ) -> None:
@@ -28,6 +41,7 @@ class CommentModel(db.Model):
         self.content = content
         self.character = character
         self.episode = episode
+
         if created_time:
             self.created_time = created_time
 
@@ -35,12 +49,17 @@ class CommentModel(db.Model):
         return {
             "id": self.id,
             "content": self.content,
-            "character": self.character,
-            "episode": self.episode,
+            "character": self.character.json(),
+            "episode": self.episode.json(),
             "created_time": self.created_time.strftime("%B %d, %Y"),
         }
 
+    def _validate_data(self):
+        if self.episode and self.character and self.episode not in self.character.episodes:
+            raise CharacterNotInEpisode()
+
     def save_to_db(self) -> None:
+        self._validate_data()
         db.session.add(self)
         db.session.commit()
 
