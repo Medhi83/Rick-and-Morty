@@ -27,13 +27,13 @@ class CommentModel(db.Model):
     character = db.relationship("CharacterModel", lazy="joined")
     episode = db.relationship("EpisodeModel", lazy="joined")
     created_time = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_time = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __init__(
         self,
         content: str,
         character: int,
         episode: int,
-        created_time: Optional[datetime] = None,
         _id: Optional[int] = None,
     ) -> None:
         if _id is not None:
@@ -42,9 +42,6 @@ class CommentModel(db.Model):
         self.character = character
         self.episode = episode
 
-        if created_time:
-            self.created_time = created_time
-
     def json(self) -> Dict[str, Union[str, Any]]:
         return {
             "id": self.id,
@@ -52,6 +49,7 @@ class CommentModel(db.Model):
             "character": self.character.json(),
             "episode": self.episode.json(),
             "created_time": self.created_time.strftime("%B %d, %Y"),
+            "updated_time": self.updated_time.strftime("%B %d, %Y"),
         }
 
     def _validate_data(self):

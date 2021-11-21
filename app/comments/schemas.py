@@ -15,6 +15,7 @@ class CommentSchema(ma.Schema):
     character = ma.fields.Nested(CharacterSchemaWithoutEpisodes())
     episode = ma.fields.Nested(EpisodeSchemaWithoutCharacters())
     created_time = ma.fields.String()
+    updated_time = ma.fields.String()
 
 
 class CommentsPaginationSchema(ma.Schema):

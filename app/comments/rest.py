@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict
 
 from flask import abort
@@ -58,6 +59,7 @@ class CommentResource(MethodView):
             comment.content = update_data["content"]
             comment.episode = update_data.get("episode")
             comment.character = update_data.get("character")
+            comment.updated_time = datetime.utcnow()
             comment.save_to_db()
         except CharacterNotInEpisode:
             abort(400, "The character is not in the episode.")

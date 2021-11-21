@@ -3,7 +3,6 @@ from typing import Tuple
 
 from app.characters.models import CharacterModel
 from app.comments.models import CommentModel
-from app.db import db
 from app.episodes.models import EpisodeModel
 from flask.testing import FlaskClient
 
@@ -83,7 +82,6 @@ def test_put(client: FlaskClient) -> None:
         json={"content": new_content, "character_id": rick.id, "episode_id": episode.id},
     )
     assert response.status_code == 200
-    db.session.refresh(comment)
     assert comment.content == new_content
 
 
