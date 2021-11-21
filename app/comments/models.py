@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import Any, Dict, Optional, Union
 
+from ..characters.models import CharacterModel
 from ..db import db
+from ..episodes.models import EpisodeModel
 
 
 class CommentException(Exception):
@@ -32,8 +34,8 @@ class CommentModel(db.Model):
     def __init__(
         self,
         content: str,
-        character: int,
-        episode: int,
+        character: Optional[CharacterModel] = None,
+        episode: Optional[EpisodeModel] = None,
         _id: Optional[int] = None,
     ) -> None:
         if _id is not None:

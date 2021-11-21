@@ -52,6 +52,8 @@ class CommentCreateArgsSchema(ma.Schema):
 
     @post_load
     def clean_data(self, data, **kwargs) -> Dict:
-        del data["character_id"]
-        del data["episode_id"]
+        if "character_id" in data:
+            del data["character_id"]
+        if "episode_id" in data:
+            del data["episode_id"]
         return data
