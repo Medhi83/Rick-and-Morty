@@ -48,8 +48,8 @@ class CommentModel(db.Model):
         return {
             "id": self.id,
             "content": self.content,
-            "character": self.character.json(),
-            "episode": self.episode.json(),
+            "character": self.character.json() if self.character else None,
+            "episode": self.episode.json() if self.episode else None,
             "created_time": self.created_time.strftime("%B %d, %Y"),
             "updated_time": self.updated_time.strftime("%B %d, %Y"),
         }
