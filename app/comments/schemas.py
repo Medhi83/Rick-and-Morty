@@ -9,21 +9,18 @@ from ..episodes.models import EpisodeModel
 from ..episodes.schemas import CharacterSchemaWithoutEpisodes
 
 
+class CommentQueryArgsSchema(ma.Schema):
+    character_id = ma.fields.Int()
+    episode_id = ma.fields.Int()
+
+
 class CommentSchema(ma.Schema):
     id = ma.fields.Int(dump_only=True)
     content = ma.fields.String()
     character = ma.fields.Nested(CharacterSchemaWithoutEpisodes())
     episode = ma.fields.Nested(EpisodeSchemaWithoutCharacters())
-    created_time = ma.fields.String()
-    updated_time = ma.fields.String()
-
-
-class CommentsPaginationSchema(ma.Schema):
-    objects = ma.fields.Nested(CommentSchema(many=True))
-    page = ma.fields.Int()
-    per_page = ma.fields.Int()
-    total_pages = ma.fields.Int()
-    total_objects = ma.fields.Int()
+    created_time = ma.fields.DateTime("%B %d, %Y")
+    updated_time = ma.fields.DateTime("%B %d, %Y")
 
 
 class CommentCreateArgsSchema(ma.Schema):

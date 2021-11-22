@@ -1,29 +1,20 @@
-from typing import Any, Dict
-
 from flask.views import MethodView
 from flask_smorest import Blueprint
+from flask_sqlalchemy import BaseQuery
 
+from ..helpers import SQLCursorPage
 from .models import CharacterModel
-from .schemas import CharactersPaginationSchema
+from .schemas import CharacterSchema, CharacterQueryArgsSchema
 
-blueprint_characters = Blueprint(
+blp_characters = Blueprint(
     "characters", "characters", url_prefix="/characters", description="Operations on characters"
 )
 
 
-@blueprint_characters.route("/")
-class Characters(MethodView):
-    @blueprint_characters.response(200, CharactersPaginationSchema())
-    @blueprint_characters.paginate()
-    def get(self, pagination_parameters) -> Dict[str, Any]:
-        pagination_results = CharacterModel.query.paginate(
-            page=pagination_parameters.page, per_page=pagination_parameters.page_size
-        )
-        pagination_parameters.item_count = len(pagination_results.items)
-        return {
-            "objects": [character.json(with_episodes=True) for character in pagination_results.items],
-            "page": pagination_results.page,
-            "per_page": pagination_results.per_page,
-            "total_pages": pagination_results.pages,
-            "total_objects": pagination_results.total,
-        }
+@blp_characters.route("/")
+class CharactersListResource(MethodView):
+    @blp_characters.arguments(CharacterQueryArgsSchema, location="query")
+    @blp_characters.response(200, CharacterSchema(many=True))
+    @blp_characters.paginate(SQLCursorPage)
+    def get(self, query) -> BaseQuery:
+        return CharacterModel.query.filter_by(**query)

@@ -4,34 +4,27 @@ from typing import Any, Dict
 from flask import abort
 from flask.views import MethodView
 from flask_smorest import Blueprint
+from flask_sqlalchemy import BaseQuery
 
+from ..helpers import SQLCursorPage
 from .models import CharacterNotInEpisode, CommentModel
-from .schemas import CommentCreateArgsSchema, CommentSchema, CommentsPaginationSchema
+from .schemas import CommentCreateArgsSchema, CommentQueryArgsSchema, CommentSchema
 
-blueprint_comments = Blueprint("comments", "comments", url_prefix="/comments", description="Operations on comments")
+blp_comments = Blueprint("comments", "comments", url_prefix="/comments", description="Operations on comments")
 
 
-@blueprint_comments.route("/")
-class CommentListResource(MethodView):
-    @blueprint_comments.response(200, CommentsPaginationSchema())
-    @blueprint_comments.paginate()
-    def get(self, pagination_parameters) -> Dict[str, Any]:
+@blp_comments.route("/")
+class CommentsListResource(MethodView):
+    @blp_comments.arguments(CommentQueryArgsSchema, location="query")
+    @blp_comments.response(200, CommentSchema(many=True))
+    @blp_comments.paginate(SQLCursorPage)
+    def get(self, query) -> BaseQuery:
         """List comments"""
-        pagination_results = CommentModel.query.paginate(
-            page=pagination_parameters.page, per_page=pagination_parameters.page_size
-        )
-        pagination_parameters.item_count = len(pagination_results.items)
-        return {
-            "objects": [comment.json() for comment in pagination_results.items],
-            "page": pagination_results.page,
-            "per_page": pagination_results.per_page,
-            "total_pages": pagination_results.pages,
-            "total_objects": pagination_results.total,
-        }
+        return CommentModel.query.filter_by(**query)
 
-    @blueprint_comments.arguments(CommentCreateArgsSchema, required=True)
-    @blueprint_comments.response(201, CommentSchema)
-    def post(self, data):
+    @blp_comments.arguments(CommentCreateArgsSchema, required=True)
+    @blp_comments.response(201, CommentSchema)
+    def post(self, data) -> CommentModel:
         """Add a new comment"""
         try:
             comment = CommentModel(**data)
@@ -42,17 +35,16 @@ class CommentListResource(MethodView):
         return comment
 
 
-@blueprint_comments.route("/<comment_id>")
+@blp_comments.route("/<comment_id>")
 class CommentResource(MethodView):
-    @blueprint_comments.response(200, CommentSchema)
-    def get(self, comment_id):
+    @blp_comments.response(200, CommentSchema)
+    def get(self, comment_id) -> CommentModel:
         """Get comment by ID"""
-        comment: CommentModel = CommentModel.query.get_or_404(comment_id)
-        return comment.json()
+        return CommentModel.query.get_or_404(comment_id)
 
-    @blueprint_comments.arguments(CommentCreateArgsSchema, required=True)
-    @blueprint_comments.response(200, CommentSchema)
-    def put(self, update_data, comment_id):
+    @blp_comments.arguments(CommentCreateArgsSchema, required=True)
+    @blp_comments.response(200, CommentSchema)
+    def put(self, update_data, comment_id) -> CommentModel:
         """Update existing comment"""
         comment: CommentModel = CommentModel.query.get_or_404(comment_id)
         try:
@@ -63,10 +55,10 @@ class CommentResource(MethodView):
             comment.save_to_db()
         except CharacterNotInEpisode:
             abort(400, "The character is not in the episode.")
-        return comment.json()
+        return comment
 
-    @blueprint_comments.response(204)
-    def delete(self, comment_id):
+    @blp_comments.response(204)
+    def delete(self, comment_id) -> None:
         """Delete comment"""
         comment: CommentModel = CommentModel.query.get_or_404(comment_id)
         comment.delete_from_db()

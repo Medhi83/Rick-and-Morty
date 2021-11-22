@@ -15,7 +15,7 @@ check_security: # Checks dependencies for known security vulnerabilities.
 	safety check -r requirements-lock.txt
 
 test:
-	env/bin/pytest tests/
+	env/bin/pytest tests/ -vv
 
 build: # Build the docker image
 	docker rm -f rick-n-morty

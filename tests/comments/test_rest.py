@@ -37,13 +37,20 @@ def test_get_list(client: FlaskClient) -> None:
     response = client.get(RESOURCE_COMMENTS)
     json_data = response.get_json()
     assert response.status_code == 200
-    assert json_data == {
-        "objects": [comment.json()],
-        "page": 1,
-        "per_page": 10,
-        "total_objects": 1,
-        "total_pages": 1,
-    }
+    expected = [comment.json()]
+    assert json_data == expected
+
+
+def test_get_list_with_query_arguments(client: FlaskClient) -> None:
+    """Should get a list of comments filter by character_id."""
+    # Setup
+    _, _, comment = add_comment_in_db()
+
+    # Test
+    response = client.get(RESOURCE_COMMENTS, data={"character_id": 1})
+    json_data = response.get_json()
+    assert response.status_code == 200
+    assert json_data == [comment.json()]
 
 
 def test_get(client: FlaskClient) -> None:

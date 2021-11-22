@@ -3,8 +3,8 @@ import os
 from flask import Flask
 from flask_smorest import Api
 
-from .characters.rest import blueprint_characters
-from .comments.rest import blueprint_comments
+from .characters.rest import blp_characters
+from .comments.rest import blp_comments
 from .db import db
 from .episodes.rest import blueprint_episodes
 
@@ -36,9 +36,9 @@ def create_app() -> Flask:
     app.config.from_object(Config)
     
     api = Api(app)
-    api.register_blueprint(blueprint_characters)
+    api.register_blueprint(blp_characters)
     api.register_blueprint(blueprint_episodes)
-    api.register_blueprint(blueprint_comments)
+    api.register_blueprint(blp_comments)
 
     init_db(app)
 

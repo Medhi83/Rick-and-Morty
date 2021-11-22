@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from app.episodes.models import EpisodeModel
 from flask.testing import FlaskClient
 
@@ -14,11 +15,5 @@ def test_get_list(client: FlaskClient):
     # Test
     response = client.get("/episodes/")
     json_data = response.get_json()
-    assert json_data == {
-        "objects": [episode.json(with_characters=True)],
-        "page": 1,
-        "per_page": 10,
-        "total_objects": 1,
-        "total_pages": 1,
-    }
+    assert json_data == [episode.json(with_characters=True)]
     assert response.status_code == 200

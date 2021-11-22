@@ -1,5 +1,8 @@
 import marshmallow as ma
 
+class EpisodeQueryArgsSchema(ma.Schema):
+    name = ma.fields.String()
+    episode = ma.fields.String()
 
 class CharacterSchemaWithoutEpisodes(ma.Schema):
     id = ma.fields.Int(dump_only=True)
@@ -13,14 +16,6 @@ class CharacterSchemaWithoutEpisodes(ma.Schema):
 class EpisodeSchema(ma.Schema):
     id = ma.fields.Int(dump_only=True)
     name = ma.fields.String()
-    air_date = ma.fields.String()
+    air_date = ma.fields.DateTime("%B %d, %Y")
     episode = ma.fields.String()
     characters = ma.fields.Nested(CharacterSchemaWithoutEpisodes(many=True))
-
-
-class EpisodesPaginationSchema(ma.Schema):
-    objects = ma.fields.Nested(EpisodeSchema(many=True))
-    page = ma.fields.Int()
-    per_page = ma.fields.Int()
-    total_pages = ma.fields.Int()
-    total_objects = ma.fields.Int()
