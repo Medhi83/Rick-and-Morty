@@ -69,10 +69,18 @@ class CommentResource(MethodView):
 @blp_comments.route("/export")
 class CommentsExportResource(MethodView):
     @blp_comments.arguments(CommentQueryArgsSchema, location="query")
+    @blp_comments.response(
+        200,
+        description="csv file",
+        headers={
+            "content-disposition": {"description": "attachment; filename=export.csv", "type": "string"},
+            "content-type": {"description": "text/csv", "type": "string"},
+        },
+    )
     def get(self, query) -> BaseQuery:
         """Export comments as csv file"""
 
-        def get_csv_fields(comment: CommentModel) -> Dict[str, Any]:
+        def _get_csv_fields(comment: CommentModel) -> Dict[str, Any]:
             data = comment.json()
             added_data = {
                 "character_id": None,
@@ -105,7 +113,7 @@ class CommentsExportResource(MethodView):
         ]
 
         comments = CommentModel.query.filter_by(**query)
-        csv_rows = (get_csv_fields(comment) for comment in comments)
+        csv_rows = (_get_csv_fields(comment) for comment in comments)
 
         si = io.StringIO()
         writer = csv.DictWriter(si, fieldnames=fieldnames, dialect="excel")
